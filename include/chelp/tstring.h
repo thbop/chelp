@@ -31,88 +31,27 @@
 // Returns a heap-allocated substring given a string, a starting pos,
 // and the number of characters to copy over (len).
 // Returns NULL if the input is invalid
-char *tstr_substr( char *string, int pos, int len ) {
-    // Check for invalid conditions
-    if ( string == NULL ) return NULL;
-    if ( pos < 0 || len < 0 ) return NULL;
-    if ( strlen( string ) < pos + len ) return NULL;
-
-    // Allocate new buffer and copy
-    char *buffer = (char*)malloc( len + 1 );
-    buffer[len] = '\0';
-
-    strncpy( buffer, string + pos, len );
-
-
-    return buffer;
-}
+char *tstr_substr( char *string, int pos, int len );
 
 // Returns a heap-allocated copy of the provided string
-char *tstr_copy( char *string ) {
-    return tstr_substr( string, 0, strlen( string ) );
-}
+char *tstr_copy( char *string );
 
 // Returns the number of times a particular character appears in a string.
-int tstr_count_char( char *string, char character ) {
-    int length = strlen( string );
-    int count = 0;
-    for ( int i = 0; i < length; i++ )
-        if ( string[i] == character )
-            count++;
-
-    return count;
-}
+int tstr_count_char( char *string, char character );
 
 // Returns the index of the first occurrence of the character provided
 // Returns -1 if the character is not found
-int tstr_find( char *string, char character ) {
-    for ( int i = 0; i < strlen( string ); i++ )
-        if ( string[i] == character )
-            return i;
-    
-    return -1;
-}
+int tstr_find( char *string, char character );
 
 // Splits a given null-terminated string by a given char
 // Returns an array of strings and the number of strings (stringCount)
 // NOTE: Everything returned by this function is heap-allocated and must be
 // freed by the user.
-char **tstr_split( char *string, char separator, int *str_count ) {
-    *str_count = tstr_count_char( string, separator ) + 1;
-    char **list = (char**)malloc( sizeof(char*) * *str_count + 1 );
-
-    int length = strlen( string );
-    int start = 0; // Start of the current substring
-    int j = 0; // Position in the list of strings
-
-    // Ignore if the last character is the separator
-    if ( string[length - 1] == separator )
-        (*str_count)--;
-
-    for ( int i = 0; i < length; i++ ) {
-        if ( string[i] == separator ) {
-            list[j] = tstr_substr( string, start, i - start );
-            start = i + 1;
-            j++;
-        }
-        else if ( i == length - 1 ) {
-            list[j] = tstr_substr( string, start, i - start + 1 );
-        }
-    }
-
-    return list;
-}
+char **tstr_split( char *string, char separator, int *str_count );
 
 // Frees a string array
 // Ensure that stringCount reflects the actual size of the array or the program
 // will seg fault.
-void tstr_free_str_array( char **str_array, int str_count ) {
-    if ( str_array == NULL ) return;
-
-    for ( int i = 0; i < str_count; i++ ) {
-        if ( str_array[i] != NULL )
-            free( str_array[i] );
-    }
-}
+void tstr_free_str_array( char **str_array, int str_count );
 
 #endif
