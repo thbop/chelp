@@ -1,5 +1,5 @@
 /*
-* Copyright © 2025 Thbop
+* Copyright © 2026 Thbop
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
@@ -20,15 +20,15 @@
 * SOFTWARE.
 */
 
-#include "vector_t.h"
+#include <vector_t.h>
 
 // Creates a new vector_t given the sizeof() the element type to be stored
-vector_t _new_vector( int elementSize ) {
+vector_t _new_vector( int element_size ) {
     return (vector_t){
-        .elementSize  = elementSize,
-        .elementCount = 0,
-        .bufferSize   = VECTOR_T_START_BUFFER_SIZE,
-        .buffer       = (unsigned char*)malloc( VECTOR_T_START_BUFFER_SIZE * elementSize ),
+        .element_size  = element_size,
+        .element_count = 0,
+        .buffer_size   = VECTOR_T_START_BUFFER_SIZE,
+        .buffer       = (unsigned char*)malloc( VECTOR_T_START_BUFFER_SIZE * element_size ),
     };
 }
 
@@ -37,12 +37,12 @@ vector_t _new_vector( int elementSize ) {
 void _vector_double_buffer( vector_t *vector ) {
     if ( vector == NULL ) return;
     
-    unsigned char *newBuffer = (unsigned char*)malloc( vector->bufferSize * vector->elementSize * 2 );
+    unsigned char *newBuffer = (unsigned char*)malloc( vector->buffer_size * vector->element_size * 2 );
 
-    memcpy( newBuffer, vector->buffer, vector->bufferSize * vector->elementSize );
+    memcpy( newBuffer, vector->buffer, vector->buffer_size * vector->element_size );
     free( vector->buffer );
 
-    vector->bufferSize *= 2;
+    vector->buffer_size *= 2;
     vector->buffer = newBuffer;
 }
 
@@ -50,10 +50,10 @@ void _vector_double_buffer( vector_t *vector ) {
 void _vector_half_buffer( vector_t *vector ) {
     if ( vector == NULL ) return;
     
-    vector->bufferSize >>= 1; // / 2
-    unsigned char *newBuffer = (unsigned char*)malloc( vector->bufferSize * vector->elementSize );
+    vector->buffer_size >>= 1; // / 2
+    unsigned char *newBuffer = (unsigned char*)malloc( vector->buffer_size * vector->element_size );
 
-    memcpy( newBuffer, vector->buffer, vector->bufferSize * vector->elementSize );
+    memcpy( newBuffer, vector->buffer, vector->buffer_size * vector->element_size );
     free( vector->buffer );
 
     vector->buffer = newBuffer;
@@ -63,16 +63,16 @@ void _vector_half_buffer( vector_t *vector ) {
 // Returns -1 if something went wrong
 int _vector_append( vector_t *vector, void *value ) {
     if ( value == NULL ) return -1;
-    if ( vector->elementCount >= vector->bufferSize ) // Grow buffer
+    if ( vector->element_count >= vector->buffer_size ) // Grow buffer
         _vector_double_buffer( vector );    
 
     // Copy it over
     memcpy(
-        vector->buffer + ( vector->elementSize * vector->elementCount ),
-        value, vector->elementSize
+        vector->buffer + ( vector->element_size * vector->element_count ),
+        value, vector->element_size
     );
-    vector->elementCount++;
-    return vector->elementCount - 1;
+    vector->element_count++;
+    return vector->element_count - 1;
 }
 
 // Inserts a value at a particular index. This does not replace the value
@@ -80,65 +80,65 @@ int _vector_append( vector_t *vector, void *value ) {
 // shifting other values upward
 void _vector_insert( vector_t *vector, unsigned int index, void *value ) {
     if ( value == NULL ) return;
-    if ( index > vector->elementCount ) return;
+    if ( index > vector->element_count ) return;
 
     // If we should actually append
-    if ( index == vector->elementCount )
+    if ( index == vector->element_count )
         _vector_append( vector, value );
     
     else {
         // Strange code to reserve space for one more element
-        void *dummy = malloc( vector->elementSize );
+        void *dummy = malloc( vector->element_size );
 
         _vector_append( vector, dummy );
 
         free(dummy);
         
         // Shift existing values
-        unsigned char *indexPos  = vector->buffer + ( vector->elementSize * index );
-        int aboveSize = vector->elementSize * ( vector->elementCount - index - 1 );
-        memmove( indexPos + vector->elementSize, indexPos, aboveSize );
+        unsigned char *indexPos  = vector->buffer + ( vector->element_size * index );
+        int aboveSize = vector->element_size * ( vector->element_count - index - 1 );
+        memmove( indexPos + vector->element_size, indexPos, aboveSize );
 
         // Copy it over
-        memcpy( indexPos, value, vector->elementSize );
+        memcpy( indexPos, value, vector->element_size );
     }
 }
 
 // Returns a pointer to a particular index
 // Use this instead of directly indexing the vector->buffer
 void *_vector_at( vector_t *vector, unsigned int index ) {
-    if ( index < vector->elementCount )
-        return vector->buffer + ( vector->elementSize * index );
+    if ( index < vector->element_count )
+        return vector->buffer + ( vector->element_size * index );
     return NULL;
 }
 
 // Searches the vector for the provided value
 // Returns the index of the value. -1 if the value is not found.
 int _vector_find( vector_t *vector, void *value ) {
-    for ( int i = 0; i < vector->elementCount; i++ )
-        if ( !memcmp( _vector_at( vector, i ), value, vector->elementSize ) )
+    for ( int i = 0; i < vector->element_count; i++ )
+        if ( !memcmp( _vector_at( vector, i ), value, vector->element_size ) )
             return i;
     
     return -1;
 }
 
 void _vector_remove_index( vector_t *vector, unsigned int index ) {
-    if ( index >= vector->elementCount ) return;
+    if ( index >= vector->element_count ) return;
 
     // Calculate how much memory we need to move
-    int aboveSize = ( vector->elementCount - index - 1 ) * vector->elementSize;
+    int aboveSize = ( vector->element_count - index - 1 ) * vector->element_size;
 
     unsigned char *element = _vector_at( vector, index );
 
     // If we're not dealing with the last value
     //     slide the above memory down one element
     if ( aboveSize > 0 )
-        memmove( element, element + vector->elementSize, aboveSize );
+        memmove( element, element + vector->element_size, aboveSize );
         
-    vector->elementCount--;
+    vector->element_count--;
 
     // Check if we need to shrink the buffer
-    if ( vector->elementCount == vector->bufferSize >> 1 )
+    if ( vector->element_count == vector->buffer_size >> 1 )
         _vector_half_buffer( vector );
 
 }
@@ -154,3 +154,4 @@ void _vector_remove( vector_t *vector, void *value ) {
 void _vector_free( vector_t *vector ) {
     free( vector->buffer );
 }
+

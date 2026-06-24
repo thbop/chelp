@@ -1,5 +1,5 @@
 /*
-* Copyright © 2025 Thbop
+* Copyright © 2026 Thbop
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
@@ -20,13 +20,12 @@
 * SOFTWARE.
 */
 
-#ifndef TSTRING_H
-#define TSTRING_H
+#pragma once
 
 // My custom string functions
 
-#include "string.h"
-#include "stdlib.h"
+#include <string.h>
+#include <stdlib.h>
 
 // Returns a heap-allocated substring given a string, a starting pos,
 // and the number of characters to copy over (len).
@@ -53,5 +52,3 @@ char **tstr_split( char *string, char separator, int *str_count );
 // Ensure that stringCount reflects the actual size of the array or the program
 // will seg fault.
 void tstr_free_str_array( char **str_array, int str_count );
-
-#endif

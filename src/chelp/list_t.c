@@ -1,5 +1,5 @@
 /*
-* Copyright © 2025 Thbop
+* Copyright © 2026 Thbop
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
@@ -20,7 +20,7 @@
 * SOFTWARE.
 */
 
-#include "list_t.h"
+#include <list_t.h>
 
 
 void *_qalloc(void *value, size_t size) {

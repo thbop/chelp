@@ -1,5 +1,5 @@
 /*
-* Copyright © 2025 Thbop
+* Copyright © 2026 Thbop
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
@@ -20,13 +20,12 @@
 * SOFTWARE.
 */
 
-#ifndef LIST_T_H
-#define LIST_T_H
+#pragma once
 
 
-#include "stdio.h"
-#include "string.h"
-#include "stdlib.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #ifndef QALLOC
 #define QALLOC
@@ -93,5 +92,3 @@ void _list_free(list_t *list);
 
 #define list_free( list ) \
     _list_free( &list )
-
-#endif

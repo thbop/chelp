@@ -1,5 +1,5 @@
 /*
-* Copyright © 2025 Thbop
+* Copyright © 2026 Thbop
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
@@ -20,11 +20,10 @@
 * SOFTWARE.
 */
 
-#ifndef VECTOR_T_H
-#define VECTOR_T_H
+#pragma once
 
-#include "stdlib.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
 
 
 #define VECTOR_T_START_BUFFER_SIZE 16
@@ -32,15 +31,15 @@
 // Dynamically resizable buffer
 typedef struct {
     unsigned int
-        elementSize,  // sizeof(ElementType)
-        elementCount, // <= bufferSize
-        bufferSize;   // Always a multiple of 2
+        element_size,  // sizeof(ElementType)
+        element_count, // <= buffer_size
+        buffer_size;   // Always a multiple of 2
     
     unsigned char *buffer;
 } vector_t;
 
 // Creates a new vector_t given the sizeof() the element type to be stored
-vector_t _new_vector( int elementSize );
+vector_t _new_vector( int element_size );
 
 // Creates a new vector_t given the element type
 #define new_vector( type ) \
@@ -77,9 +76,17 @@ void *_vector_at( vector_t *vector, unsigned int index );
 #define vector_at( type, vector, index ) \
     ( *(type*)_vector_at( &(vector), index ) )
 
+// For each through the vector
+#define vector_foreach_ptr( type, item, vector ) \
+    for ( unsigned int _i263 = 0; _i263 < (vector).element_count; _i263++ ) \
+        if ( ( (item) = (type*)_vector_at( &(vector), _i263 ) ), 1 )
+
+#define vector_length( vector ) \
+    (vector).element_count
+
 // "Returns" the size in bytes of all the elements
 #define vector_sizeof_elements( vector ) \
-    ( (vector).elementSize * (vector).elementCount )
+    ( (vector).element_size * (vector).element_count )
 
 // Searches the vector for the provided value
 // Returns the index of the value. -1 if the value is not found.
@@ -112,5 +119,3 @@ void _vector_free( vector_t *vector );
 // Frees a vector's heap-allocated resources
 #define vector_free( vector ) \
     _vector_free( &(vector) )
-
-#endif
